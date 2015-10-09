@@ -78,6 +78,7 @@ public class EventJavaProcessTest {
       @Override
       public void run() {
         try {
+          Thread.sleep(1000); // gives time for the server socket to bind and accept
           SocketClient.main(String.valueOf(ports[0]));
         } catch (Exception e) {
           e.printStackTrace();
@@ -100,6 +101,7 @@ public class EventJavaProcessTest {
         .pipeStderr()
         .build();
 
+    Thread.sleep(1000); // gives time for the server socket to bind and accept
     AnyProcess clientProc = AnyProcess.newBuilder()
         .debug()
         .command("java", "-classpath", cp, SocketClient.class.getName(), String.valueOf(ports2[0]))
@@ -122,6 +124,7 @@ public class EventJavaProcessTest {
         .debug()
         .build();
 
+    Thread.sleep(1000); // gives time for the server socket to bind and accept
     JavaProcess clientJava = JavaProcess.newBuilder()
         .mainClass(SocketClient.class)
         .addClasspath(SocketClient.class)
