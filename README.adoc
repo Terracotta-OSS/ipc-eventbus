@@ -35,8 +35,10 @@ See also: http://www.github.com/ehcache/ehcache3
 
 == Build and Maven dependency
 
+Fork, then:
+
 ```
-git clone http://matc@irepo.eur.ad.sag/scm/~matc/ipc-eventbus.git
+git clone git@github.com:Terracotta-OSS/ipc-eventbus.git
 mvn clean install
 ```
 
