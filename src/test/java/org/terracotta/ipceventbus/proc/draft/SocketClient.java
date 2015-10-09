@@ -32,6 +32,5 @@ public class SocketClient {
     new ObjectOutputStream(socket.getOutputStream()).writeObject("hello world!");
     System.out.println("client read from server: " + new ObjectInputStream(socket.getInputStream()).readObject());
     socket.close();
-    Thread.sleep(2000);
   }
 }

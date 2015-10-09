@@ -28,13 +28,15 @@ import java.net.Socket;
  */
 public class SocketServer {
   public static void main(String... args) throws Exception {
+
     ServerSocket serverSocket = ServerSocketFactory.getDefault().createServerSocket();
     serverSocket.bind(new InetSocketAddress("0.0.0.0", Integer.parseInt(args[0])));
     Socket socket = serverSocket.accept();
     System.out.println("server read from client: " + new ObjectInputStream(socket.getInputStream()).readObject());
-    new ObjectOutputStream(socket.getOutputStream()).writeObject("hello world!");
+    ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+    objectOutputStream.writeObject("hello world!");
+    objectOutputStream.flush();
     socket.close();
     serverSocket.close();
-    Thread.sleep(2000);
   }
 }

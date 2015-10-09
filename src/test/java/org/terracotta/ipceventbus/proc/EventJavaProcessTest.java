@@ -68,7 +68,7 @@ public class EventJavaProcessTest {
         try {
           SocketServer.main(String.valueOf(ports[0]));
         } catch (Exception e) {
-          throw new RuntimeException(e.getMessage(), e);
+          e.printStackTrace();
         }
       }
     };
@@ -80,7 +80,7 @@ public class EventJavaProcessTest {
         try {
           SocketClient.main(String.valueOf(ports[0]));
         } catch (Exception e) {
-          throw new RuntimeException(e.getMessage(), e);
+          e.printStackTrace();
         }
       }
     };
@@ -90,19 +90,19 @@ public class EventJavaProcessTest {
     clientThread.join();
 
     String cp = new File(SocketServer.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsolutePath();
+    final int[] ports2 = getRandomPorts(1);
+    System.out.println("ports: " + Arrays.toString(ports));
 
     AnyProcess serverProc = AnyProcess.newBuilder()
-        .command("java", "-classpath", cp, SocketServer.class.getName(), String.valueOf(ports[0]))
-        .recordStdout()
-        .recordStderr()
+        .debug()
+        .command("java", "-classpath", cp, SocketServer.class.getName(), String.valueOf(ports2[0]))
         .pipeStdout()
         .pipeStderr()
         .build();
 
     AnyProcess clientProc = AnyProcess.newBuilder()
-        .command("java", "-classpath", cp, SocketClient.class.getName(), String.valueOf(ports[0]))
-        .recordStdout()
-        .recordStderr()
+        .debug()
+        .command("java", "-classpath", cp, SocketClient.class.getName(), String.valueOf(ports2[0]))
         .pipeStdout()
         .pipeStderr()
         .build();
@@ -110,24 +110,25 @@ public class EventJavaProcessTest {
     serverProc.waitFor();
     clientProc.waitFor();
 
+    final int[] ports3 = getRandomPorts(1);
+    System.out.println("ports: " + Arrays.toString(ports));
+
     JavaProcess serverJava = JavaProcess.newBuilder()
         .mainClass(SocketServer.class)
         .addClasspath(SocketServer.class)
-        .arguments(String.valueOf(ports[0]))
-        .recordStdout()
-        .recordStderr()
+        .arguments(String.valueOf(ports3[0]))
         .pipeStdout()
         .pipeStderr()
+        .debug()
         .build();
 
     JavaProcess clientJava = JavaProcess.newBuilder()
         .mainClass(SocketClient.class)
         .addClasspath(SocketClient.class)
-        .arguments(String.valueOf(ports[0]))
-        .recordStdout()
-        .recordStderr()
+        .arguments(String.valueOf(ports3[0]))
         .pipeStdout()
         .pipeStderr()
+        .debug()
         .build();
 
     serverJava.waitFor();
