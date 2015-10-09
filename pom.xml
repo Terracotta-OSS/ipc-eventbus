@@ -20,7 +20,7 @@ limitations under the License.
 
   <groupId>org.terracotta</groupId>
   <artifactId>ipc-eventbus</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>IPC EventBus</name>
