@@ -54,23 +54,23 @@ Status of the build: image:https://terracotta-oss.ci.cloudbees.com/buildStatus/i
 
 This project contains several modules:
 
-- [I/O Stuff](#io-stuff)
+- **I/O Stuff**
 
 An EventBus API with a local and remote implementation:
 
-- [Local EventBus](#local-eventbus):
-- [Remote EventBus](#remote-eventbus)
+- **Local EventBus**
+- **Remote EventBus**
 
 Process launching mechanisms:
 
-- [Process Launching](#process-launching)
-- [Java Process Launching](#java-process-launching)
+- **Process Launching**
+- **Java Process Launching**
 
 And a way to start a Java process which can interact with its launcher through an event bus:
 
 - [Inter Java Process Communication](#ipc)
 
-=== <a name="io-stuff"></a> I/O Stuff
+=== I/O Stuff
 
 __Pipe__
 
@@ -103,7 +103,7 @@ plex.streamCount();         // number of streams
 plex.write(data);           // MultiplexOutputStream is an OutputStream
 ```
 
-=== <a name="local-eventbus"></a> Local EventBus
+=== Local EventBus
 
 Create a local `EventBus` by using a builder:
 
@@ -168,7 +168,7 @@ event.getTimestamp();           // time in ms of the event
 event.isUserEvent();            // check if it is a user event. You might listen to system events such as eventbus.server.close, eventbus.client.connect, eventbus.client.disconnect
 ```
 
-=== <a name="remote-eventbus"></a>Remote EventBus
+=== Remote EventBus
 
 `RemoteEventBus` have the same builder options that a local `EventBus` but serves as inter-process communication through a socket. One `EventBus` acts as a server and several clients can connect to it.
 
@@ -199,7 +199,7 @@ If nothing is given in the builders, `EventBus` will try to use the system prope
 
 If no system property is found, `localhost` is used for the host and `56789` is used for the port.
 
-=== <a name="process-launching"></a>Process Launching
+=== Process Launching
 
 Creates a Java process, similar to `ProcessBuilder` but has several improvements to access stdout, stderr and stdin of the process, cache them, forward them, access the process PID, etc.
 
@@ -248,7 +248,7 @@ You can also use a Java `Future`:
 Future future = process.getFuture();        // get a future representing the process execution. You can cancel (=destroy) the process or wait for its completion
 ```
 
-=== <a name="java-process-launching"></a>Java Process Launching
+=== Java Process Launching
 
 Another builder allows you to quickly start a Java main class with specific env and system properties. You can access the same builder methods as above.
 
@@ -274,7 +274,7 @@ javaProcess.getJavaExecutable();            // automatically resolved from java 
 javaProcess.getJavaHome();                  // automatically resolved from java home, but you can override it in the builder
 ```
 
-=== <a name="ipc"></a> Inter Java Process Communication
+=== Inter Java Process Communication
 
 This builder allows you to start any main class linked to a remote `EventBus` to be able to communicate with some other processes.
 
