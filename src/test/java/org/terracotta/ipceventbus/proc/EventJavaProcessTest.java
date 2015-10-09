@@ -25,6 +25,9 @@ import org.terracotta.ipceventbus.proc.draft.SocketClient;
 import org.terracotta.ipceventbus.proc.draft.SocketServer;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
@@ -53,13 +56,17 @@ public class EventJavaProcessTest {
     assertTrue(process.getRecordedStderrText().contains("java.lang.ClassNotFoundException: org.terracotta.ipceventbus.proc.EchoEvent"));
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = 5000)
   public void child_server_socket() throws Throwable {
+
+    final int[] ports = getRandomPorts(1);
+    System.out.println("ports: " + Arrays.toString(ports));
+
     Thread serverThread = new Thread("server") {
       @Override
       public void run() {
         try {
-          SocketServer.main(new String[]{"12345"});
+          SocketServer.main(String.valueOf(ports[0]));
         } catch (Exception e) {
           throw new RuntimeException(e.getMessage(), e);
         }
@@ -71,7 +78,7 @@ public class EventJavaProcessTest {
       @Override
       public void run() {
         try {
-          SocketClient.main(new String[]{"12345"});
+          SocketClient.main(String.valueOf(ports[0]));
         } catch (Exception e) {
           throw new RuntimeException(e.getMessage(), e);
         }
@@ -85,7 +92,7 @@ public class EventJavaProcessTest {
     String cp = new File(SocketServer.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsolutePath();
 
     AnyProcess serverProc = AnyProcess.newBuilder()
-        .command("java", "-classpath", cp, SocketServer.class.getName(), "12345")
+        .command("java", "-classpath", cp, SocketServer.class.getName(), String.valueOf(ports[0]))
         .recordStdout()
         .recordStderr()
         .pipeStdout()
@@ -93,7 +100,7 @@ public class EventJavaProcessTest {
         .build();
 
     AnyProcess clientProc = AnyProcess.newBuilder()
-        .command("java", "-classpath", cp, SocketClient.class.getName(), "12345")
+        .command("java", "-classpath", cp, SocketClient.class.getName(), String.valueOf(ports[0]))
         .recordStdout()
         .recordStderr()
         .pipeStdout()
@@ -106,7 +113,7 @@ public class EventJavaProcessTest {
     JavaProcess serverJava = JavaProcess.newBuilder()
         .mainClass(SocketServer.class)
         .addClasspath(SocketServer.class)
-        .arguments("12345")
+        .arguments(String.valueOf(ports[0]))
         .recordStdout()
         .recordStderr()
         .pipeStdout()
@@ -116,7 +123,7 @@ public class EventJavaProcessTest {
     JavaProcess clientJava = JavaProcess.newBuilder()
         .mainClass(SocketClient.class)
         .addClasspath(SocketClient.class)
-        .arguments("12345")
+        .arguments(String.valueOf(ports[0]))
         .recordStdout()
         .recordStderr()
         .pipeStdout()
@@ -198,6 +205,18 @@ public class EventJavaProcessTest {
     process.waitFor();
 
     latch.await();
+  }
+
+  private static int[] getRandomPorts(int n) {
+    int[] ports = new int[n];
+    for (int port = 2000, i = 0; i < ports.length && port < 65000; port++) {
+      try {
+        new ServerSocket(port).close();
+        ports[i++] = port;
+      } catch (IOException ignored) {
+      }
+    }
+    return ports;
   }
 
 }

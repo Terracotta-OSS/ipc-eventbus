@@ -27,11 +27,11 @@ import java.net.Socket;
  * @author Mathieu Carbou
  */
 public class SocketServer {
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     ServerSocket serverSocket = ServerSocketFactory.getDefault().createServerSocket();
     serverSocket.bind(new InetSocketAddress("0.0.0.0", Integer.parseInt(args[0])));
     Socket socket = serverSocket.accept();
-    System.out.println("server: " + new ObjectInputStream(socket.getInputStream()).readObject());
+    System.out.println("server read from client: " + new ObjectInputStream(socket.getInputStream()).readObject());
     new ObjectOutputStream(socket.getOutputStream()).writeObject("hello world!");
     socket.close();
     serverSocket.close();

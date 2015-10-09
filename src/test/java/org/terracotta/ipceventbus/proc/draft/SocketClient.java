@@ -26,11 +26,11 @@ import java.net.Socket;
  * @author Mathieu Carbou
  */
 public class SocketClient {
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     Socket socket = SocketFactory.getDefault().createSocket();
     socket.connect(new InetSocketAddress("localhost", Integer.parseInt(args[0])));
     new ObjectOutputStream(socket.getOutputStream()).writeObject("hello world!");
-    System.out.println("client: " + new ObjectInputStream(socket.getInputStream()).readObject());
+    System.out.println("client read from server: " + new ObjectInputStream(socket.getInputStream()).readObject());
     socket.close();
     Thread.sleep(2000);
   }
