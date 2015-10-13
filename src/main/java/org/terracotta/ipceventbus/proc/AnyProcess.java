@@ -36,7 +36,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Mathieu Carbou
@@ -47,7 +46,7 @@ public class AnyProcess extends Process {
 
   private final long pid;
   private final Process process;
-  private final AtomicBoolean running = new AtomicBoolean(true);
+  private volatile boolean running = true;
   private volatile boolean destroyed;
   private final FutureTask<Integer> future;
   private final Collection<Pipe> pipes = new ArrayList<Pipe>(3);
@@ -109,7 +108,9 @@ public class AnyProcess extends Process {
       this.future = new FutureTask<Integer>(new Callable<Integer>() {
         @Override
         public Integer call() throws Exception {
-          return AnyProcess.this.process.waitFor();
+          int r = AnyProcess.this.process.waitFor();
+          processFinished();
+          return r;
         }
       }) {
         @Override
@@ -120,25 +121,8 @@ public class AnyProcess extends Process {
           } catch (InterruptedException ignored) {
           }
           destroyed = true;
+          processFinished();
           return super.cancel(mayInterruptIfRunning);
-        }
-
-        @Override
-        protected void done() {
-          running.set(false);
-          if (destroyed) {
-            try {
-              finishPipe(false);
-            } catch (InterruptedException ignored) {
-            }
-            onDestroyed();
-          } else {
-            try {
-              finishPipe(true);
-            } catch (InterruptedException ignored) {
-            }
-            onTerminated();
-          }
         }
       };
       Thread thread = new Thread(future, "Process future@" + this.pid);
@@ -212,8 +196,28 @@ public class AnyProcess extends Process {
   public final int exitValue() {
     int c = process.exitValue();
     // if process is not running, an exception is not thrown, thus it means the process is finished
-    running.set(false);
+    processFinished();
     return c;
+  }
+
+  private void processFinished() {
+    if (destroyed) {
+      try {
+        finishPipe(false);
+      } catch (InterruptedException ignored) {
+      }
+    } else {
+      try {
+        finishPipe(true);
+      } catch (InterruptedException ignored) {
+      }
+    }
+    running = false;
+    if (destroyed) {
+      onDestroyed();
+    } else {
+      onTerminated();
+    }
   }
 
   @Override
@@ -248,7 +252,7 @@ public class AnyProcess extends Process {
   }
 
   public final boolean isRunning() {
-    return running.get();
+    return running;
   }
 
   public final boolean isDestroyed() {
