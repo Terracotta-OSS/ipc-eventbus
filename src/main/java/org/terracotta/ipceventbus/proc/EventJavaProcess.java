@@ -43,9 +43,10 @@ public final class EventJavaProcess extends JavaProcess {
     super(process,
         pipeStdout, pipeStderr, pipeStdin, collectStdout, collectStderr, command, workingDir,
         javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProperties);
-    EventBus eb = null;
     String pid = getCurrentPid();
-    for (int i = 0; i < 4; i++) {
+    // try to connect
+    EventBus eb = null;
+    for (int i = 0; i < 4 && isRunning(); i++) {
       try {
         eb = new EventBusClient.Builder()
             .connect(port)
@@ -53,10 +54,16 @@ public final class EventJavaProcess extends JavaProcess {
             .build();
         break;
       } catch (EventBusIOException e) {
+        if (i == 3) {
+          process.destroy();
+          throw new EventBusIOException("Unable to connect to child process " + getPid() + " within 2 seconds.");
+        }
         try {
           Thread.sleep(500);
         } catch (InterruptedException e1) {
-          throw new EventBusIOException("Unable to connect to child process " + getPid() + " within 2 seconds.");
+          process.destroy();
+          Thread.currentThread().interrupt();
+          throw new EventBusIOException("Unable to connect to child process " + getPid() + ": connection interrupted.", e1);
         }
       }
     }
@@ -70,7 +77,7 @@ public final class EventJavaProcess extends JavaProcess {
 
   @Override
   protected void onDestroyed() {
-    if(eventBus != null) {
+    if (eventBus != null) {
       eventBus.trigger("process.destroyed");
     }
     close();
@@ -78,7 +85,7 @@ public final class EventJavaProcess extends JavaProcess {
 
   @Override
   protected void onTerminated() {
-    if(eventBus != null) {
+    if (eventBus != null) {
       eventBus.trigger("process.exited");
     }
     close();

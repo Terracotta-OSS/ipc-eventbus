@@ -45,6 +45,8 @@ public class EventJavaProcessTest {
     EventJavaProcess process = EventJavaProcess.newBuilder()
         .randomPort()
         .mainClass(EchoEvent.class.getName())
+        .pipeStdout()
+        .pipeStderr()
         .recordStdout()
         .recordStderr()
         .build();

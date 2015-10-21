@@ -115,14 +115,25 @@ public class AnyProcess extends Process {
       }) {
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-          AnyProcess.this.process.destroy();
+          if (mayInterruptIfRunning) {
+            AnyProcess.this.process.destroy();
+          }
+          boolean interrupted = false;
           try {
             AnyProcess.this.process.waitFor();
           } catch (InterruptedException ignored) {
+            interrupted = true;
           }
-          destroyed = true;
-          processFinished();
-          return super.cancel(mayInterruptIfRunning);
+          try {
+            destroyed = true;
+            processFinished();
+            return super.cancel(mayInterruptIfRunning);
+          } finally {
+            if (interrupted) {
+              // restore interrupt state
+              Thread.currentThread().interrupt();
+            }
+          }
         }
       };
       Thread thread = new Thread(future, "Process future@" + this.pid);
@@ -202,15 +213,9 @@ public class AnyProcess extends Process {
 
   private void processFinished() {
     if (destroyed) {
-      try {
-        finishPipe(false);
-      } catch (InterruptedException ignored) {
-      }
+      finishPipe(false);
     } else {
-      try {
-        finishPipe(true);
-      } catch (InterruptedException ignored) {
-      }
+      finishPipe(true);
     }
     running = false;
     if (destroyed) {
@@ -297,13 +302,21 @@ public class AnyProcess extends Process {
   protected void onDestroyed() {
   }
 
-  private void finishPipe(boolean wait) throws InterruptedException {
+  private void finishPipe(boolean wait) {
     synchronized (pipes) {
       for (Pipe pipe : pipes) {
-        if (wait) {
-          pipe.waitFor();
+        try {
+          if (wait) {
+            try {
+              pipe.waitFor();
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              break;
+            }
+          }
+        } finally {
+          pipe.close();
         }
-        pipe.close();
       }
       pipes.clear();
     }
