@@ -21,8 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class Pipe implements Closeable {
+
+  private static final Logger LOGGER = Logger.getLogger(Pipe.class.getName());
 
   private volatile Thread pipe;
 
@@ -43,7 +47,7 @@ public final class Pipe implements Closeable {
           }
         } catch (InterruptedIOException ignored) {
         } catch (IOException e) {
-          e.printStackTrace();
+          LOGGER.log(Level.WARNING, "Error reading/writing streams: " + e.getMessage(), e);
         } finally {
           close();
         }
@@ -54,8 +58,9 @@ public final class Pipe implements Closeable {
   }
 
   public void waitFor() throws InterruptedException {
-    if (pipe != null) {
-      pipe.join();
+    Thread t = this.pipe;
+    if (t != null) {
+      t.join();
       close();
     }
   }
