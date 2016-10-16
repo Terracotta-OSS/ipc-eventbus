@@ -121,7 +121,7 @@ EventBus eventBus = new EventBus.Builder()
 eventBus.getId(); // returns the eventbus id
 ```
 
-Implement `EventListener`` interface to listen to events
+Implement `EventListener` interface to listen to events
 
 ```
 EventListener listener = new EventListener() {
@@ -193,7 +193,7 @@ Client creation
 EventBusClient client = new EventBusClient.Builder()
         .id("peer2")
         .connect(56789)              // OPTIONAL: port to connect to
-        .connect("lcoalhost", 56789) // OPTIONAL: port and host to connect to. Default is localhost:56789
+        .connect("localhost", 56789) // OPTIONAL: port and host to connect to. Default is localhost:56789
         .build();
 ```
 
