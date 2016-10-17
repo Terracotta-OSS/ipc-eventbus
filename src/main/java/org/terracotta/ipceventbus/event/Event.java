@@ -45,9 +45,9 @@ public interface Event {
   /**
    * Convert the raw data in given type
    *
-   * @param type Teh class of wanted type
+   * @param type The class of wanted type
    * @param <T>  The type to cast the raw data into
-   * @return The catsed raw data
+   * @return The casted raw data
    */
   <T> T getData(Class<T> type);
 
