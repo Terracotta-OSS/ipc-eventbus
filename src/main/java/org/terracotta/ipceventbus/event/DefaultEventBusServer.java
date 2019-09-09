@@ -92,7 +92,7 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
 
   @Override
   public boolean isClosed() {
-    return serverSocket.get() == null;
+    return serverSocket.get() == null || serverSocket.get().isClosed();
   }
 
   @Override

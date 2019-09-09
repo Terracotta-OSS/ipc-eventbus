@@ -16,6 +16,8 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import com.jayway.awaitility.Awaitility;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,7 +30,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -58,7 +62,7 @@ public class EventJavaProcessTest {
     assertTrue(process.getRecordedStderrText().contains("java.lang.ClassNotFoundException: org.terracotta.ipceventbus.proc.EchoEvent"));
   }
 
-  @Test(timeout = 5000)
+  @Test(timeout = 10_000)
   public void child_server_socket() throws Throwable {
 
     final int[] ports = getRandomPorts(1);
@@ -158,7 +162,12 @@ public class EventJavaProcessTest {
     System.out.println("Test: PID: " + process.getCurrentPid());
     System.out.println("Test: CHILD PID: " + process.getPid());
 
-    assertTrue(process.isEventBusConnected());
+    Awaitility.waitAtMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+      @Override
+      public Boolean call() {
+        return process.isEventBusConnected();
+      }
+    });
 
     process.trigger("ping", "hello");
     process.trigger("process.exit");
@@ -177,7 +186,12 @@ public class EventJavaProcessTest {
         .debug() // activate debug mode for ipc eventbus
         .build();
 
-    assertTrue(process.isEventBusConnected());
+    Awaitility.waitAtMost(5, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+      @Override
+      public Boolean call() {
+        return process.isEventBusConnected();
+      }
+    });
 
     final CountDownLatch latch = new CountDownLatch(3);
 

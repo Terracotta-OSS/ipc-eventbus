@@ -100,7 +100,7 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
 
   @Override
   public boolean isClosed() {
-    return socket.get() == null;
+    return socket.get() == null || socket.get().isClosed();
   }
 
   @Override

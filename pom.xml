@@ -20,10 +20,10 @@ limitations under the License.
 
   <groupId>org.terracotta</groupId>
   <artifactId>ipc-eventbus</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.1.0_JAVA11-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>IPC EventBus</name>
+  <name>ipc-eventbus</name>
   <description>A library that offers a local and remote event bus system and process launching capabilities, with inter-process communication</description>
   <url>https://github.com/Terracotta-OSS/ipc-eventbus/</url>
 
@@ -37,9 +37,10 @@ limitations under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>1.6</java.version>
+    <java.version>1.8</java.version>
     <terracotta-os-snapshots-url>http://nexus.terracotta.eur.ad.sag/content/repositories/terracotta-os-snapshots</terracotta-os-snapshots-url>
     <terracotta-os-releases-url>http://nexus.terracotta.eur.ad.sag/content/repositories/terracotta-os-releases</terracotta-os-releases-url>
+    <skipJavadoc>false</skipJavadoc>
   </properties>
 
   <dependencies>
@@ -56,13 +57,19 @@ limitations under the License.
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.jayway.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>1.3.4</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.8.1</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -70,11 +77,12 @@ limitations under the License.
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
+            <phase>verify</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
@@ -111,7 +119,11 @@ limitations under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.1</version>
+        <version>3.1.1</version>
+        <configuration>
+          <skip>${skipJavadoc}</skip>
+          <source>8</source>
+        </configuration>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -136,7 +148,7 @@ limitations under the License.
             <plugin>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>findbugs-maven-plugin</artifactId>
-              <version>3.0.0</version>
+              <version>3.0.5</version>
             </plugin>
           </plugins>
         </pluginManagement>
@@ -170,7 +182,7 @@ limitations under the License.
         <dependency>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
-          <version>2.0.3</version>
+          <version>3.0.1</version>
           <optional>true</optional>
         </dependency>
       </dependencies>
@@ -198,7 +210,7 @@ limitations under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
