@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -46,16 +47,18 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
       close();
       throw new EventBusIOException("Bad socket: " + socket + " : " + e.getMessage(), e);
     }
+    final CountDownLatch receiving = new CountDownLatch(1);
     receiver = new Thread("reader@" + getId()) {
       @Override
       public void run() {
+        receiving.countDown();
         while (!Thread.currentThread().isInterrupted() && !isClosed()) {
           Event event = null;
           try {
             event = (Event) inputStream.readObject();
-          } catch (IOException e) {
-            close();
-          } catch (ClassNotFoundException e) {
+          } catch (IOException | ClassNotFoundException e) {
+            sendLocal(new DefaultEvent(DefaultEventBusClient.this.getId(), "eventbus.client.error", e));
+
             close();
           }
           if (event != null && "eventbus.event".equals(event.getName())) {
@@ -66,6 +69,12 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
     };
     receiver.setDaemon(true);
     receiver.start();
+    try {
+      receiving.await();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    }
   }
 
   @Override
