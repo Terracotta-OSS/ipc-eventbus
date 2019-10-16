@@ -23,6 +23,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -59,9 +60,11 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
         }
       }
     };
+    final CountDownLatch listening = new CountDownLatch(1);
     acceptor = new Thread("client-acceptor") {
       @Override
       public void run() {
+        listening.countDown();
         while (!Thread.currentThread().isInterrupted() && !isClosed()) {
           try {
             Socket socket = DefaultEventBusServer.this.serverSocket.get().accept();
@@ -83,6 +86,12 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
     };
     acceptor.setDaemon(true);
     acceptor.start();
+    try {
+      listening.await();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IllegalStateException(e);
+    }
   }
 
   @Override
