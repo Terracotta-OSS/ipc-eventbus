@@ -16,6 +16,7 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import org.terracotta.ipceventbus.ThreadUtil;
 import org.terracotta.ipceventbus.event.Event;
 import org.terracotta.ipceventbus.event.EventListener;
 
@@ -30,6 +31,6 @@ public class EchoEvent2 {
         Bus.get().trigger("pong", e.getData());
       }
     });
-    Thread.sleep(2000);
+    ThreadUtil.minimumSleep(2000);
   }
 }

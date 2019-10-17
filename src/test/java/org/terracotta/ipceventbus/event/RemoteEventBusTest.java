@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.terracotta.ipceventbus.ThreadUtil;
 
 import java.io.IOException;
 
@@ -99,12 +100,12 @@ public class RemoteEventBusTest extends AbstractEventBusTest<EventBusClient> {
     peer2.on(new EventListenerSniffer("peer2"));
 
     peer1.trigger("action");
-    Thread.sleep(1000);
+    ThreadUtil.minimumSleep(1000);
     System.out.println(listener);
     assertEquals(2, listener.userEvents);
 
     peer2.trigger("action");
-    Thread.sleep(1000);
+    ThreadUtil.minimumSleep(1000);
     System.out.println(listener);
     assertEquals(4, listener.userEvents);
 

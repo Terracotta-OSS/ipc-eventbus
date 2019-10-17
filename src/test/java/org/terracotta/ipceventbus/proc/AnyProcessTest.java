@@ -19,6 +19,7 @@ package org.terracotta.ipceventbus.proc;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.terracotta.ipceventbus.ThreadUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -152,7 +153,7 @@ public class AnyProcessTest {
         .env("VAR", "Hello world!")
         .build();
 
-    Thread.sleep(500);
+    ThreadUtil.minimumSleep(500);
     proc.destroy();
     assertTrue(proc.isDestroyed());
 
@@ -185,7 +186,7 @@ public class AnyProcessTest {
         .env("VAR", "Hello world!")
         .build();
 
-    Thread.sleep(500);
+    ThreadUtil.minimumSleep(500);
     boolean wasCancelled = proc.getFuture().cancel(true);
     assertTrue(proc.isDestroyed());
 

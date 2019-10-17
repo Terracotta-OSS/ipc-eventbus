@@ -16,6 +16,7 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import org.terracotta.ipceventbus.ThreadUtil;
 import org.terracotta.ipceventbus.event.Event;
 import org.terracotta.ipceventbus.event.EventBus;
 import org.terracotta.ipceventbus.event.EventListener;
@@ -52,7 +53,7 @@ public class EchoEvent {
       }
     });
 
-    Thread.sleep(1000);
+    ThreadUtil.minimumSleep(1000);
   }
 
   private static String getCurrentPid() {
