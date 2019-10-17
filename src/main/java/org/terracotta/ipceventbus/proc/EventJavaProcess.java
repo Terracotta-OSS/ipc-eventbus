@@ -16,6 +16,7 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import org.terracotta.ipceventbus.ThreadUtil;
 import org.terracotta.ipceventbus.event.EventBus;
 import org.terracotta.ipceventbus.event.EventBusClient;
 import org.terracotta.ipceventbus.event.EventBusIOException;
@@ -59,7 +60,7 @@ public final class EventJavaProcess extends JavaProcess {
           throw new EventBusIOException("Unable to connect to child process " + getPid() + " within 2 seconds.");
         }
         try {
-          Thread.sleep(500);
+          ThreadUtil.minimumSleep(500);
         } catch (InterruptedException e1) {
           process.destroy();
           Thread.currentThread().interrupt();

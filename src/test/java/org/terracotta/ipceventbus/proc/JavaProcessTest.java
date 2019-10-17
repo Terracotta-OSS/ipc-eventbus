@@ -19,6 +19,7 @@ package org.terracotta.ipceventbus.proc;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.terracotta.ipceventbus.ThreadUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +35,7 @@ public class JavaProcessTest {
     JavaProcess proc = JavaProcess.newBuilder()
         .mainClass(Echo.class.getName())
         .addClasspath(Echo.class)
+        .addClasspath(ThreadUtil.class)
         .addClasspath(JUnit4.class)
         .arguments("one", "two")
         .addJvmProp("my.prop", "world")
@@ -59,6 +61,7 @@ public class JavaProcessTest {
     JavaProcess proc = JavaProcess.newBuilder()
         .mainClass(EchoFail.class.getName())
         .addClasspath(EchoFail.class)
+        .addClasspath(ThreadUtil.class)
         .addClasspath(JUnit4.class)
         .arguments("one", "two")
         .addJvmProp("my.prop", "world")

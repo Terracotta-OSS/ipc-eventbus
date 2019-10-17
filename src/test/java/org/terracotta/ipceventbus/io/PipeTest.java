@@ -19,6 +19,7 @@ package org.terracotta.ipceventbus.io;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.terracotta.ipceventbus.ThreadUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class PipeTest {
         try {
           for (int i = 1; i <= 5; i++) {
             out.write(("put-" + i + "\n").getBytes());
-            Thread.sleep(500);
+            ThreadUtil.minimumSleep(500);
           }
           out.close();
         } catch (Exception e) {
@@ -78,7 +79,7 @@ public class PipeTest {
             out.write(("a").getBytes());
             out.flush();
             brake.countDown();
-            Thread.sleep(500);
+            ThreadUtil.minimumSleep(500);
           }
           fail();
         } catch (Exception e) {

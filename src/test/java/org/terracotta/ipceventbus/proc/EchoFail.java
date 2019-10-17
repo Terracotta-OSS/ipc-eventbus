@@ -16,6 +16,8 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import org.terracotta.ipceventbus.ThreadUtil;
+
 import static org.junit.Assert.fail;
 
 /**
@@ -28,7 +30,7 @@ public class EchoFail {
     for (String arg : args) {
       System.out.println(arg);
     }
-    Thread.sleep(1000);
+    ThreadUtil.minimumSleep(1000);
     fail("message");
   }
 }
