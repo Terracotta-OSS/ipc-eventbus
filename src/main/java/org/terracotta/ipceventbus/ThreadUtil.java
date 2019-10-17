@@ -18,14 +18,14 @@ package org.terracotta.ipceventbus;
 
 import java.util.concurrent.TimeUnit;
 
-public class ThreadUtil {
-  // Java does not provide a guarantee that Thread.sleep will actually sleep long enough.
-  // In fact, on Windows, it does not sleep for long enough.
-  // This method keeps sleeping until the full time has passed.
-  //
-  // Using System.nanoTime (accurate to 1 micro-second or better) in lieu of System.currentTimeMillis (on Windows
-  // accurate to ~16ms), the inaccuracy of which compounds when invoked multiple times, as in this method.
+// Java does not provide a guarantee that Thread.sleep will actually sleep long enough.
+// In fact, on Windows, it does not sleep for long enough.
+// This method keeps sleeping until the full time has passed.
+//
+// Using System.nanoTime (accurate to 1 micro-second or better) in lieu of System.currentTimeMillis (on Windows
+// accurate to ~16ms), the inaccuracy of which compounds when invoked multiple times, as in this method.
 
+public class ThreadUtil {
   public static void minimumSleep(long millis) throws InterruptedException {
     long nanos = TimeUnit.MILLISECONDS.toNanos(millis);
     long start = System.nanoTime();
