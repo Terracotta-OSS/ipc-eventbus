@@ -77,7 +77,6 @@ public class JavaProcessTest {
         "world\n" +
         "one\n" +
         "two\n", proc.getRecordedStdoutText());
-    System.out.println("RecordedStderrText: '" + proc.getRecordedStderrText() + "'");
     assertTrue(proc.getRecordedStderrText().contains("Exception in thread \"main\" java.lang.AssertionError: message"));
   }
 

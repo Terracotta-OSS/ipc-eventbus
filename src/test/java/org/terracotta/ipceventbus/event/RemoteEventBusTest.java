@@ -16,6 +16,7 @@
 
 package org.terracotta.ipceventbus.event;
 
+import com.jayway.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,8 @@ import org.junit.runners.JUnit4;
 import org.terracotta.ipceventbus.ThreadUtil;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -79,7 +82,7 @@ public class RemoteEventBusTest extends AbstractEventBusTest<EventBusClient> {
   }
 
   @Test
-  public void bus_can_communicate_events() throws IOException, InterruptedException {
+  public void bus_can_communicate_events() throws Throwable {
 
     RecordingEventListener listener = new RecordingEventListener();
 
@@ -100,14 +103,20 @@ public class RemoteEventBusTest extends AbstractEventBusTest<EventBusClient> {
     peer2.on(new EventListenerSniffer("peer2"));
 
     peer1.trigger("action");
-    ThreadUtil.minimumSleep(1000);
-    System.out.println(listener);
-    assertEquals(2, listener.userEvents);
+    Awaitility.waitAtMost(1, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+      @Override
+      public Boolean call() {
+        return 2 == listener.userEvents;
+      }
+    });
 
     peer2.trigger("action");
-    ThreadUtil.minimumSleep(1000);
-    System.out.println(listener);
-    assertEquals(4, listener.userEvents);
+    Awaitility.waitAtMost(1, TimeUnit.SECONDS).until(new Callable<Boolean>() {
+      @Override
+      public Boolean call() {
+        return 4 == listener.userEvents;
+      }
+    });
 
     peer1.close();
     peer2.close();
