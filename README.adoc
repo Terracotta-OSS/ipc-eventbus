@@ -24,7 +24,7 @@ The goal of this project is to be:
 - simple
 - efficient
 - targets small usages, i.e. integration tests, system tests, which request several process synchronization and classpath isolation
-- Java 6 Compatible, so that you can use it in any TC project
+- Java 8 Compatible, so that you can use it in any TC project
 
 Licensed under the Apache License, Version 2.0   
 (C) Terracotta, Inc., a Software AG company.

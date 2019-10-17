@@ -186,11 +186,11 @@ public class AnyProcessTest {
         .build();
 
     Thread.sleep(500);
-    proc.getFuture().cancel(true);
+    boolean wasCancelled = proc.getFuture().cancel(true);
     assertTrue(proc.isDestroyed());
 
     assertTrue(proc.getFuture().isDone());
-    assertTrue(proc.getFuture().isCancelled());
+    assertTrue(proc.getFuture().isCancelled() == wasCancelled);
 
     // 143 = return code when SIGKILL
     assertEquals(143, proc.exitValue());
@@ -198,7 +198,9 @@ public class AnyProcessTest {
 
     try {
       proc.getFuture().get();
-      fail();
+      if (wasCancelled) {
+        fail();
+      }
     } catch (Exception e) {
       assertEquals(CancellationException.class, e.getClass());
     }

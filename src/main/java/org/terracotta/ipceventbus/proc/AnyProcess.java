@@ -332,7 +332,8 @@ public class AnyProcess extends Process {
         return Jna.getWindowsPid(process);
       }
     } else {
-      if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
+      String procClassName = process.getClass().getName();
+      if (procClassName.equals("java.lang.ProcessImpl") || procClassName.equals("java.lang.UNIXProcess")) {
         try {
           Field f = process.getClass().getDeclaredField("pid");
           f.setAccessible(true);
