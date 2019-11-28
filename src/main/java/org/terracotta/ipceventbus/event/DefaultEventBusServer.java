@@ -114,6 +114,10 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
         } catch (IOException ignored) {
         }
         acceptor.interrupt();
+        try {
+            acceptor.join();
+        } catch (InterruptedException ignored) {
+        }
         acceptor = null;
         for (DefaultEventBusClient client : getClients()) {
           client.close();
