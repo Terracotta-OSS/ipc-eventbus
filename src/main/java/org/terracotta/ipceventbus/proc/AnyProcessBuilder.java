@@ -36,10 +36,10 @@ public class AnyProcessBuilder<T extends AnyProcess> {
   OutputStream pipeStdout;
   OutputStream pipeStderr;
   boolean redirectStderr;
-  Map<String, String> env = new LinkedHashMap<String, String>(System.getenv());
+  Map<String, String> env = new LinkedHashMap<>(System.getenv());
   boolean recordStdout;
   boolean recordStderr;
-  List<String> command = new ArrayList<String>();
+  List<String> command = new ArrayList<>();
   boolean debug;
 
   public AnyProcessBuilder<T> debug() {
@@ -48,7 +48,7 @@ public class AnyProcessBuilder<T extends AnyProcess> {
   }
 
   public final AnyProcessBuilder<T> command(String... command) {
-    this.command = new ArrayList<String>(Arrays.asList(command));
+    this.command = new ArrayList<>(Arrays.asList(command));
     return this;
   }
 
@@ -90,7 +90,7 @@ public class AnyProcessBuilder<T extends AnyProcess> {
   }
 
   public final AnyProcessBuilder<T> env(Map<String, String> newEnv) {
-    this.env = new LinkedHashMap<String, String>(newEnv);
+    this.env = new LinkedHashMap<>(newEnv);
     return this;
   }
 
@@ -141,7 +141,7 @@ public class AnyProcessBuilder<T extends AnyProcess> {
     try {
       return builder.start();
     } catch (IOException e) {
-      throw new IllegalArgumentException("Unable to start " + command);
+      throw new IllegalArgumentException("Unable to start " + command, e);
     }
   }
 
