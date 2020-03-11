@@ -26,11 +26,11 @@ import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -42,14 +42,14 @@ import java.util.concurrent.TimeoutException;
  */
 public class AnyProcess extends Process {
 
-  private static final Charset UTF8 = Charset.forName("UTF-8");
+  private static final Charset UTF8 = StandardCharsets.UTF_8;
 
   private final long pid;
   private final Process process;
   private volatile boolean running = true;
   private volatile boolean destroyed;
   private final FutureTask<Integer> future;
-  private final Collection<Pipe> pipes = new ArrayList<Pipe>(3);
+  private final Collection<Pipe> pipes = new ArrayList<>(3);
   private final ByteArrayOutputStream recordedStdout;
   private final ByteArrayOutputStream recordedStderr;
   private final List<String> command;
@@ -105,13 +105,10 @@ public class AnyProcess extends Process {
 
     // starts future
     {
-      this.future = new FutureTask<Integer>(new Callable<Integer>() {
-        @Override
-        public Integer call() throws Exception {
-          int r = AnyProcess.this.process.waitFor();
-          processFinished();
-          return r;
-        }
+      this.future = new FutureTask<Integer>(() -> {
+        int r = AnyProcess.this.process.waitFor();
+        processFinished();
+        return r;
       }) {
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -323,7 +320,7 @@ public class AnyProcess extends Process {
   }
 
   public static AnyProcessBuilder<? extends AnyProcess> newBuilder() {
-    return new AnyProcessBuilder<AnyProcess>();
+    return new AnyProcessBuilder<>();
   }
 
   private static long getPid(Process process) {
