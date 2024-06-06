@@ -24,6 +24,7 @@ public class BaseBuilder<T extends BaseBuilder<T>> {
 
   String busId;
   ErrorListener errorListener = new RethrowingErrorListener();
+  Listeners listeners = new Listeners();
 
   BaseBuilder() {
   }
@@ -40,6 +41,27 @@ public class BaseBuilder<T extends BaseBuilder<T>> {
   }
 
   /**
+   * Register a new listener for an event
+   *
+   * @param event    The event name
+   * @param listener The listener to register
+   */
+  public T on(String event, EventListener listener) {
+    listeners.on(event).add(listener);
+    return (T) this;
+  }
+
+  /**
+   * Register a new listener for all event
+   *
+   * @param listener The listener to register
+   */
+  public T on(EventListener listener) {
+    listeners.on("").add(listener);
+    return (T) this;
+  }
+
+  /**
    * Registers an {@link ErrorListener} to handle exceptions thrown by {@link EventListener}. By default, exceptions are rethrown.
    *
    * @param listener The listener to use. Some default implementations are provided.
@@ -51,7 +73,7 @@ public class BaseBuilder<T extends BaseBuilder<T>> {
   }
 
   public EventBus build() throws EventBusException {
-    return new DefaultEventBus(busId != null ? busId : UUID.randomUUID().toString(), errorListener);
+    return new DefaultEventBus(busId != null ? busId : UUID.randomUUID().toString(), errorListener, listeners);
   }
 
 }

@@ -52,7 +52,7 @@ public interface EventBusClient extends RemoteEventBus {
       try {
         Socket socket = SocketFactory.getDefault().createSocket();
         socket.connect(endpoint);
-        return busId == null ? new DefaultEventBusClient(socket, errorListener) : new DefaultEventBusClient(busId, socket, errorListener);
+        return busId == null ? new DefaultEventBusClient(socket, errorListener, listeners) : new DefaultEventBusClient(busId, socket, errorListener, listeners);
       } catch (IOException e) {
         throw new EventBusIOException("Bad endpoint: " + endpoint.getHostName() + ":" + endpoint.getPort() + " : " + e.getMessage(), e);
       }

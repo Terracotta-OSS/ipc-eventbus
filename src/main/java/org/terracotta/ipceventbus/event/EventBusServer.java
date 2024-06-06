@@ -54,7 +54,7 @@ public interface EventBusServer extends RemoteEventBus {
       try {
         ServerSocket serverSocket = ServerSocketFactory.getDefault().createServerSocket();
         serverSocket.bind(new InetSocketAddress(address, port));
-        return new DefaultEventBusServer(busId != null ? busId : (serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort()), serverSocket, errorListener);
+        return new DefaultEventBusServer(busId != null ? busId : (serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort()), serverSocket, errorListener, listeners);
       } catch (IOException e) {
         throw new EventBusIOException("Cannot bind on " + address + ":" + port + " : " + e.getMessage(), e);
       }

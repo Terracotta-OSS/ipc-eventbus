@@ -17,16 +17,28 @@
 package org.terracotta.ipceventbus.event;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Carbou
  */
 final class Listeners {
 
-  private final ConcurrentMap<String, Collection<EventListener>> index = new ConcurrentHashMap<String, Collection<EventListener>>();
+  private final ConcurrentMap<String, Collection<EventListener>> index;
+
+  Listeners(Listeners original) {
+    this.index = new ConcurrentHashMap<>(original.index.entrySet().stream().collect(Collectors.toMap(
+            Map.Entry::getKey,
+            e -> new CopyOnWriteArrayList<>(e.getValue()))));
+  }
+
+  Listeners() {
+    this.index = new ConcurrentHashMap<>();
+  }
 
   public Collection<EventListener> on(String event) {
     this.index.putIfAbsent(event, new CopyOnWriteArrayList<EventListener>());
