@@ -38,8 +38,8 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
   private final AtomicReference<ServerSocket> serverSocket = new AtomicReference<ServerSocket>();
   private Thread acceptor;
 
-  DefaultEventBusServer(String uuid, ServerSocket serverSocket, final ErrorListener errorListener) {
-    super(uuid, errorListener);
+  DefaultEventBusServer(String uuid, ServerSocket serverSocket, final ErrorListener errorListener, final Listeners listeners) {
+    super(uuid, errorListener, listeners);
     this.serverSocket.set(serverSocket);
     final EventListener listener = new EventListener() {
       @Override
@@ -100,6 +100,11 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
   }
 
   @Override
+  public String getServerHost() {
+    return serverSocket.get().getInetAddress().getHostName();
+  }
+
+  @Override
   public boolean isClosed() {
     return serverSocket.get() == null || serverSocket.get().isClosed();
   }
@@ -152,4 +157,8 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
     }
   }
 
+  @Override
+  public int getClientCount() {
+    return getClients().size();
+  }
 }

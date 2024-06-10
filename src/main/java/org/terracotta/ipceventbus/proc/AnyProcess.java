@@ -323,7 +323,7 @@ public class AnyProcess extends Process {
     return new AnyProcessBuilder<>();
   }
 
-  private static long getPid(Process process) {
+  protected static long getPid(Process process) {
     if (isWindows()) {
       if (isJnaAvailable()) {
         return Jna.getWindowsPid(process);
@@ -355,7 +355,7 @@ public class AnyProcess extends Process {
     return System.getProperty("os.name", "unknown").toLowerCase().contains("windows");
   }
 
-  protected final String getCurrentPid() {
+  protected static final String getCurrentPid() {
     try {
       return ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
     } catch (Exception ignored) {

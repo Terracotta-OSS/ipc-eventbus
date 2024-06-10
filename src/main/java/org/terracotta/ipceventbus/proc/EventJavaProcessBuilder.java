@@ -16,47 +16,54 @@
 
 package org.terracotta.ipceventbus.proc;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.List;
-import java.util.Random;
+import org.terracotta.ipceventbus.event.EventBusServer;
+import org.terracotta.ipceventbus.event.EventListener;
 
 /**
  * @author Mathieu Carbou
  */
 public class EventJavaProcessBuilder<T extends EventJavaProcess> extends JavaProcessBuilder<T> {
 
-  int port;
+  final EventBusServer.Builder eventBusBuilder = new EventBusServer.Builder();
 
   public EventJavaProcessBuilder<T> port(int port) {
-    this.port = port;
+    eventBusBuilder.listen(port);
     return this;
   }
 
   public EventJavaProcessBuilder<T> randomPort() {
-    return port(0);
+    eventBusBuilder.listenRandom();
+    return this;
+  }
+
+  /**
+   * Register a new listener for an event
+   *
+   * @param event    The event name
+   * @param listener The listener to register
+   */
+  public EventJavaProcessBuilder<T> on(String event, EventListener listener) {
+    eventBusBuilder.on(event, listener);
+    return this;
+  }
+
+  /**
+   * Register a new listener for all event
+   *
+   * @param listener The listener to register
+   */
+  public EventJavaProcessBuilder<T> on(EventListener listener) {
+    eventBusBuilder.on(listener);
+    return this;
   }
 
   @Override
-  protected void buildCommand() {
-    if (port > 0) {
-      try {
-        new ServerSocket(port).close();
-      } catch (IOException e) {
-        throw new IllegalArgumentException("Cannot listen on port " + port + ": " + e.getMessage(), e);
-      }
-    } else {
-      while (true) {
-        port = 1025 + new Random().nextInt(64000);
-        try {
-          new ServerSocket(port).close();
-          break;
-        } catch (IOException ignored) {
-        }
-      }
-    }
+  public T build() {
+    EventBusServer eventBusServer = eventBusBuilder.build();
+
+    addJvmProp("ipc.bus.host", "localhost");
+    addJvmProp("ipc.bus.port", Integer.toString(eventBusServer.getServerPort()));
     addClasspath(Bus.class);
-    addJvmProp("ipc.bus.port", "" + port);
     if (debug) {
       addJvmProp("ipc.bus.debug", "true");
     }
@@ -65,17 +72,10 @@ public class EventJavaProcessBuilder<T extends EventJavaProcess> extends JavaPro
       mainClass(Boot.class.getName());
     }
 
-    super.buildCommand();
+    buildCommand();
+    return (T) new EventJavaProcess(createProcess(),
+            pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir,
+            javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProps,
+            debug, eventBusServer);
   }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  protected T wrap(Process process, List<String> command) {
-    return (T) new EventJavaProcess(
-        process,
-        pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir,
-        javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProps,
-        port, debug);
-  }
-
 }

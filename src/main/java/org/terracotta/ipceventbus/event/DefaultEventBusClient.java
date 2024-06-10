@@ -33,12 +33,16 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
   private ObjectInputStream inputStream;
   private Thread receiver;
 
-  DefaultEventBusClient(Socket socket, ErrorListener listener) {
-    this(socket.getLocalAddress().getHostName() + ":" + socket.getLocalPort(), socket, listener);
+  DefaultEventBusClient(Socket socket, ErrorListener listener, Listeners initialListeners) {
+    this(socket.getLocalAddress().getHostName() + ":" + socket.getLocalPort(), socket, listener, initialListeners);
   }
 
   DefaultEventBusClient(String uuid, Socket socket, ErrorListener listener) {
-    super(uuid, listener);
+    this(uuid, socket, listener, new Listeners());
+  }
+
+  DefaultEventBusClient(String uuid, Socket socket, ErrorListener listener, Listeners initialListeners) {
+    super(uuid, listener, initialListeners);
     this.socket.set(socket);
     try {
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());

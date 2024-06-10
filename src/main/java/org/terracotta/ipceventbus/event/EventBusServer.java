@@ -25,6 +25,8 @@ import java.net.ServerSocket;
  */
 public interface EventBusServer extends RemoteEventBus {
 
+  int getClientCount();
+
   final class Builder extends BaseBuilder<Builder> {
 
     int port = Integer.parseInt(System.getProperty("ipc.bus.port", "56789"));
@@ -54,7 +56,7 @@ public interface EventBusServer extends RemoteEventBus {
       try {
         ServerSocket serverSocket = ServerSocketFactory.getDefault().createServerSocket();
         serverSocket.bind(new InetSocketAddress(address, port));
-        return new DefaultEventBusServer(busId != null ? busId : (serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort()), serverSocket, errorListener);
+        return new DefaultEventBusServer(busId != null ? busId : (serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort()), serverSocket, errorListener, listeners);
       } catch (IOException e) {
         throw new EventBusIOException("Cannot bind on " + address + ":" + port + " : " + e.getMessage(), e);
       }

@@ -23,11 +23,16 @@ class DefaultEventBus implements EventBus {
 
   private final String uuid;
   private final ErrorListener errorListener;
-  protected final Listeners listeners = new Listeners();
+  protected final Listeners listeners;
 
   DefaultEventBus(String uuid, ErrorListener errorListener) {
+    this(uuid, errorListener, new Listeners());
+  }
+
+  DefaultEventBus(String uuid, ErrorListener errorListener, Listeners initialListeners) {
     this.uuid = uuid;
     this.errorListener = errorListener;
+    this.listeners = new Listeners(initialListeners);
   }
 
   @Override
