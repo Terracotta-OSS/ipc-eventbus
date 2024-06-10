@@ -25,6 +25,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.lang.String.join;
 
 /**
  * @author Mathieu Carbou
@@ -109,25 +112,11 @@ public class AnyProcessBuilder<T extends AnyProcess> {
     return this;
   }
 
-  public final T build() {
-    buildCommand();
-    Process process = createProcess();
-    T t = wrap(process, command);
-    if (debug) {
-      System.out.println("[" + t.getCurrentPid() + "] Started process " + t.getPid() + ": " + t.getCommandLine());
-    }
-    return t;
+  public T build() {
+    return (T) new AnyProcess(createProcess(), pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir);
   }
 
-  protected void buildCommand() {
-  }
-
-  @SuppressWarnings("unchecked")
-  protected T wrap(Process process, List<String> command) {
-    return (T) new AnyProcess(process, pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir);
-  }
-
-  private Process createProcess() {
+  protected Process createProcess() {
     if (command.isEmpty()) {
       throw new IllegalArgumentException("Missing command");
     }
@@ -139,7 +128,11 @@ public class AnyProcessBuilder<T extends AnyProcess> {
     processEnv.clear();
     processEnv.putAll(this.env);
     try {
-      return builder.start();
+      Process process = builder.start();
+      if (debug) {
+        System.out.println("[" + AnyProcess.getCurrentPid() + "] Started process " + AnyProcess.getPid(process) + ": " + join(" ", builder.command()));
+      }
+      return process;
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to start " + command, e);
     }

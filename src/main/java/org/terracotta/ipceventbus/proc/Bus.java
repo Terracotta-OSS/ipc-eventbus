@@ -16,7 +16,7 @@
 
 package org.terracotta.ipceventbus.proc;
 
-import org.terracotta.ipceventbus.event.EventBusServer;
+import org.terracotta.ipceventbus.event.EventBusClient;
 import org.terracotta.ipceventbus.event.EventListenerSniffer;
 
 import java.lang.management.ManagementFactory;
@@ -26,20 +26,19 @@ import java.lang.management.ManagementFactory;
  */
 public final class Bus {
 
-  private static final EventBusServer bus;
+  private static final EventBusClient bus;
 
   static {
-    int port = 0;
-    if (System.getProperty("ipc.bus.port") != null) {
-      port = Integer.parseInt(System.getProperty("ipc.bus.port"));
-    }
+    String host = System.getProperty("ipc.bus.host");
+    int port = Integer.parseInt(System.getProperty("ipc.bus.port"));
     String pid = getCurrentPid();
+
     if (isDebug()) {
       System.out.println("[" + Boot.class.getSimpleName() + "] Child PID: " + pid);
-      System.out.println("[" + Boot.class.getSimpleName() + "] Starting EventBus Server " + pid + " on 0.0.0.0:" + port + "...");
+      System.out.println("[" + Boot.class.getSimpleName() + "] Connecting EventBus Client " + pid + " to " + host + ":" + port + "...");
     }
-    bus = new EventBusServer.Builder()
-        .listen(port)
+    bus = new EventBusClient.Builder()
+        .connect(host, port)
         .id(pid)
         .build();
     if (isDebug()) {
@@ -47,7 +46,7 @@ public final class Bus {
     }
   }
 
-  public static EventBusServer get() {
+  public static EventBusClient get() {
     return bus;
   }
 

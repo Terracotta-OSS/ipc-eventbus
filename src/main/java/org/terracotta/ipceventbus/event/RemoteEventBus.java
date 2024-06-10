@@ -27,6 +27,8 @@ public interface RemoteEventBus extends EventBus, Closeable {
    */
   int getServerPort();
 
+  String getServerHost();
+
   boolean isClosed();
 
 }

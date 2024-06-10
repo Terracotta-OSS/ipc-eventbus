@@ -25,6 +25,8 @@ import java.net.ServerSocket;
  */
 public interface EventBusServer extends RemoteEventBus {
 
+  int getClientCount();
+
   final class Builder extends BaseBuilder<Builder> {
 
     int port = Integer.parseInt(System.getProperty("ipc.bus.port", "56789"));

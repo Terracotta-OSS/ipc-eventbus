@@ -117,7 +117,6 @@ public class JavaProcessBuilder<T extends JavaProcess> extends AnyProcessBuilder
     return this;
   }
 
-  @Override
   protected void buildCommand() {
     if (mainClass == null) {
       throw new IllegalArgumentException("Missing main class");
@@ -155,13 +154,13 @@ public class JavaProcessBuilder<T extends JavaProcess> extends AnyProcessBuilder
     command.addAll(arguments);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  protected T wrap(Process process, List<String> command) {
+  public T build() {
+    buildCommand();
     return (T) new JavaProcess(
-        process,
-        pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir,
-        javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProps);
+            createProcess(),
+            pipeStdout, pipeStderr, pipeStdin, recordStdout, recordStderr, command, workingDir,
+            javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProps);
   }
 
   private static File findJavaExecutable(File javaHome) {

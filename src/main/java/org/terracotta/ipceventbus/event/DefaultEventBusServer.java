@@ -100,6 +100,11 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
   }
 
   @Override
+  public String getServerHost() {
+    return serverSocket.get().getInetAddress().getHostName();
+  }
+
+  @Override
   public boolean isClosed() {
     return serverSocket.get() == null || serverSocket.get().isClosed();
   }
@@ -152,4 +157,8 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
     }
   }
 
+  @Override
+  public int getClientCount() {
+    return getClients().size();
+  }
 }

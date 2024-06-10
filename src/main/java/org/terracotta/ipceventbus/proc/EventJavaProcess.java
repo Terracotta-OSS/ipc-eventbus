@@ -16,10 +16,8 @@
 
 package org.terracotta.ipceventbus.proc;
 
-import org.terracotta.ipceventbus.ThreadUtil;
-import org.terracotta.ipceventbus.event.EventBus;
 import org.terracotta.ipceventbus.event.EventBusClient;
-import org.terracotta.ipceventbus.event.EventBusIOException;
+import org.terracotta.ipceventbus.event.EventBusServer;
 import org.terracotta.ipceventbus.event.EventListener;
 import org.terracotta.ipceventbus.event.EventListenerSniffer;
 
@@ -35,42 +33,18 @@ import java.util.Map;
  */
 public final class EventJavaProcess extends JavaProcess {
 
-  private volatile EventBus eventBus;
+  private volatile EventBusServer eventBus;
 
   public EventJavaProcess(Process process,
                           OutputStream pipeStdout, OutputStream pipeStderr, InputStream pipeStdin, boolean collectStdout, boolean collectStderr, List<String> command, File workingDir,
                           File javaHome, File javaExecutable, List<String> jvmArgs, List<File> classpath, String mainClass, List<String> arguments, Map<String, String> jvmProperties,
-                          int port, boolean debug) {
+                          boolean debug, EventBusServer eventBusServer) {
     super(process,
         pipeStdout, pipeStderr, pipeStdin, collectStdout, collectStderr, command, workingDir,
         javaHome, javaExecutable, jvmArgs, classpath, mainClass, arguments, jvmProperties);
     String pid = getCurrentPid();
     // try to connect
-    EventBus eb = null;
-    for (int i = 0; i < 4 && isRunning(); i++) {
-      try {
-        eb = new EventBusClient.Builder()
-            .connect(port)
-            .id(pid)
-            .build();
-        break;
-      } catch (EventBusIOException e) {
-        if (i == 3) {
-          process.destroy();
-          throw new EventBusIOException("Unable to connect to child process " + getPid() + " within 2 seconds.");
-        }
-        try {
-          ThreadUtil.minimumSleep(500);
-        } catch (InterruptedException e1) {
-          process.destroy();
-          Thread.currentThread().interrupt();
-          throw new EventBusIOException("Unable to connect to child process " + getPid() + ": connection interrupted.", e1);
-        }
-      }
-    }
-    this.eventBus = eb != null ? eb : new EventBus.Builder()
-        .id(pid)
-        .build();
+    this.eventBus = eventBusServer;
     if (debug) {
       eventBus.on(new EventListenerSniffer(pid));
     }
@@ -102,15 +76,15 @@ public final class EventJavaProcess extends JavaProcess {
   }
 
   public final boolean isEventBusConnected() {
-    return eventBus instanceof EventBusClient && !((EventBusClient) eventBus).isClosed();
+    return eventBus.getClientCount() > 0;
   }
 
   public final String getEventBusServerHost() {
-    return eventBus instanceof EventBusClient ? ((EventBusClient) eventBus).getServerHost() : null;
+    return eventBus.getServerHost();
   }
 
   public final int getEventBusServerPort() {
-    return eventBus instanceof EventBusClient ? ((EventBusClient) eventBus).getServerPort() : -1;
+    return eventBus.getServerPort();
   }
 
   public final String getEventBusId() {
