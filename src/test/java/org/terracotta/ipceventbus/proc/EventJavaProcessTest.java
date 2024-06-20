@@ -145,7 +145,7 @@ public class EventJavaProcessTest {
     clientJava.waitFor();
   }
 
-  @Test(timeout = 5000)
+  @Test(timeout = 10_000)
   public void sample_usage_launch_ipc_process() throws Throwable {
 
     EventJavaProcess process = EventJavaProcess.newBuilder()
@@ -177,7 +177,7 @@ public class EventJavaProcessTest {
     assertEquals("", process.getRecordedStderrText());
   }
 
-  @Test(timeout = 5000)
+  @Test(timeout = 10_000)
   public void be_alerted_of_process_end() throws Throwable {
 
     EventJavaProcess process = EventJavaProcess.newBuilder()

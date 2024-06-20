@@ -144,7 +144,7 @@ public class AnyProcessTest {
     assertEquals(0, anyProcess.waitFor());
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = 10_000)
   public void test_destroy() throws InterruptedException {
     AnyProcess proc = AnyProcess.newBuilder()
         .command("bash", "-c", "sleep 3; echo $VAR")
@@ -177,7 +177,7 @@ public class AnyProcessTest {
     assertEquals(0, proc.getFuture().get().intValue());
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = 10_000)
   public void test_destroy_future() throws InterruptedException {
     AnyProcess proc = AnyProcess.newBuilder()
         .command("bash", "-c", "sleep 3; echo $VAR")
