@@ -16,6 +16,8 @@
 
 package org.terracotta.ipceventbus.proc;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import org.terracotta.ipceventbus.io.MultiplexOutputStream;
 import org.terracotta.ipceventbus.io.Pipe;
 
@@ -36,6 +38,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static java.lang.Class.forName;
 
 /**
  * @author Mathieu Carbou
@@ -329,13 +333,18 @@ public class AnyProcess extends Process {
         return Jna.getWindowsPid(process);
       }
     } else {
-      String procClassName = process.getClass().getName();
-      if (procClassName.equals("java.lang.ProcessImpl") || procClassName.equals("java.lang.UNIXProcess")) {
-        try {
-          Field f = process.getClass().getDeclaredField("pid");
-          f.setAccessible(true);
-          return f.getInt(process);
-        } catch (Throwable ignored) {
+      try {
+        Method pidMethod = forName("java.lang.Process").getMethod("pid");
+        return (long) pidMethod.invoke(process);
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+        String procClassName = process.getClass().getName();
+        if (procClassName.equals("java.lang.ProcessImpl") || procClassName.equals("java.lang.UNIXProcess")) {
+          try {
+            Field f = process.getClass().getDeclaredField("pid");
+            f.setAccessible(true);
+            return f.getInt(process);
+          } catch (Throwable ignored) {
+          }
         }
       }
     }
