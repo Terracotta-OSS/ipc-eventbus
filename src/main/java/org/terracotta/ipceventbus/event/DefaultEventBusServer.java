@@ -138,8 +138,13 @@ final class DefaultEventBusServer extends DefaultEventBus implements EventBusSer
   }
 
   void sendRemote(Event event) {
-    for (DefaultEventBusClient client : clients) {
-      client.sendRemote(event);
+    clientsLock.readLock().lock();
+    try {
+      for (DefaultEventBusClient client : clients) {
+        client.sendRemote(event);
+      }
+    } finally {
+      clientsLock.readLock().unlock();
     }
   }
 

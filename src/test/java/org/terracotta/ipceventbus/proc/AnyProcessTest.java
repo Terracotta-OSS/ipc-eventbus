@@ -31,6 +31,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +47,7 @@ public class AnyProcessTest {
   @Test
   public void test_launch_process() throws InterruptedException {
     AnyProcess anyProcess = AnyProcess.newBuilder()
-        .command("bash", "-c", "sleep 2; echo $VAR")
+        .command("bash", "-c", "sleep 5; echo $VAR")
         .env("VAR", "Hello world!")
         .pipeStdout()
         .pipeStderr()
@@ -92,9 +94,9 @@ public class AnyProcessTest {
       assertEquals("Process not terminated.", e.getMessage());
     }
 
-    assertTrue(anyProcess.getPid() > 0);
+    assertThat(anyProcess.getPid(), greaterThan(0L));
     assertTrue(anyProcess.isRunning());
-    assertEquals(Arrays.asList("bash", "-c", "sleep 2; echo $VAR"), anyProcess.getCommand());
+    assertEquals(Arrays.asList("bash", "-c", "sleep 5; echo $VAR"), anyProcess.getCommand());
     assertEquals(new File("."), anyProcess.getWorkingDirectory());
     assertEquals(0, anyProcess.waitFor());
     assertEquals(0, anyProcess.exitValue());
