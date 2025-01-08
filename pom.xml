@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   Copyright 2015 Terracotta, Inc., a Software AG company.
-  Copyright Super iPaaS Integration LLC, an IBM Company 2024
+  Copyright IBM Corp. 2024, 2025
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -232,7 +232,7 @@
     <developer>
       <name>Mathieu Carbou</name>
       <email>Mathieu.Carbou@ibm.com</email>
-      <organization>Super iPaaS Integration LLC, an IBM Company</organization>
+      <organization>IBM</organization>
       <organizationUrl>https://terracotta.org</organizationUrl>
     </developer>
   </developers>
