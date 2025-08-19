@@ -25,9 +25,9 @@ import java.util.List;
  */
 class RecordingEventListener implements EventListener {
 
-  int events;
-  int userEvents;
-  int systemEvents;
+  volatile int events;
+  volatile int userEvents;
+  volatile int systemEvents;
   List<String> sources = new ArrayList<String>();
   List<String> names = new ArrayList<String>();
 
