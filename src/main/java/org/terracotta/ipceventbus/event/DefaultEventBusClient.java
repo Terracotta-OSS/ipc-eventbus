@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
 
-  private final AtomicReference<Socket> socket = new AtomicReference<Socket>();
+  private final AtomicReference<Socket> socket;
   private ObjectOutputStream outputStream;
   private ObjectInputStream inputStream;
   private Thread receiver;
@@ -44,7 +44,7 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
 
   DefaultEventBusClient(String uuid, Socket socket, ErrorListener listener, Listeners initialListeners) {
     super(uuid, listener, initialListeners);
-    this.socket.set(socket);
+    this.socket = new AtomicReference<>(socket);
     try {
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
       this.inputStream = new ObjectInputStream(socket.getInputStream());
@@ -114,7 +114,8 @@ class DefaultEventBusClient extends DefaultEventBus implements EventBusClient {
 
   @Override
   public boolean isClosed() {
-    return socket.get() == null || socket.get().isClosed();
+    Socket s = socket.get();
+    return s == null || s.isClosed();
   }
 
   @Override

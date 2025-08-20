@@ -45,6 +45,8 @@ public class RemoteEventBusPeerCommunicationTest {
 
     peer2.on(listener);
     peer2.on(new EventListenerSniffer("peer2"));
+    
+    Awaitility.waitAtMost(10, TimeUnit.SECONDS).until(() -> listener.names.stream().anyMatch("eventbus.client.connect"::equals));
 
     peer1.trigger("action");
     Awaitility.waitAtMost(10, TimeUnit.SECONDS).until(() -> 2 == listener.userEvents);
